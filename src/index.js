@@ -13,10 +13,16 @@ class Sudoku extends Component {
         });
     }
     activeBlock = (active) => {
-        this.setState({
-            activeBlock: active
-        });
-        this.chooseNumber(active[2]);
+        if ( active ) {
+            this.setState({
+                activeBlock: active
+            });
+            this.chooseNumber(active[2]);
+        } else {
+            this.setState({
+                setNum: null
+            });
+        }
     }
 
     render () {

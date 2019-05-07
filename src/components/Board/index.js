@@ -10,11 +10,12 @@ const SBoard = styled.div`
 `
 
 const Selected = styled.div`
-    border: ${props => props.active ? '1px solid blue' : 'none'};
+    border: none;
 `
 
 const SCol = styled(Col)`
-    border: 1px solid red;
+    background: ${props => props.hasDefault ? '#efefef' : props => props.active ? 'green' : '#ffffff'};
+    border: 1px solid #e9e9e9;
     text-align: center;
     padding: 20px 10px;
     @media (max-width: 568px) {
@@ -37,15 +38,31 @@ class Board extends Component {
         })
     }
 
-    setActiveBlock (posX, posY, value) {
-        const activeBlock = [posX, posY, value];
-        this.props.active(activeBlock);
-        this.setState({
-            active: [posX, posY]
-        });
+    checkDefault(posX, posY) {
+        const blockValue = this.props.showNum;
+        return blockValue[posX][posY] > 0;
+    }
+
+    setActiveBlock (posX, posY, value, defaultValue) {
+        //Selected tile should only be allowed for blocks that are unset / has no intial value
+        if ( defaultValue ) {
+            this.props.active(null);
+            this.setState({
+                active: []
+            });
+        } else {
+            const activeBlock = [posX, posY, value];
+            this.props.active(activeBlock);
+            this.setState({
+                active: [posX, posY]
+            });
+        }
     }
 
     updateGameData (active, newValue) {
+        if (!newValue) {
+            return;
+        }
         const loadedData = this.state.showNum;
         const posX = active[0];
         const posY = active[1];
@@ -82,9 +99,9 @@ class Board extends Component {
                         <Row key={xpos}>
                         {i.map((j, ypos) => {
                             return (
-                                <SCol key={xpos + '-' + ypos} onClick={() => this.setActiveBlock(xpos, ypos, j)}>
+                                <SCol key={xpos + '-' + ypos} active={active && xpos === active[0] && ypos === active[1]} onClick={() => this.setActiveBlock(xpos, ypos, j, this.checkDefault(xpos, ypos))} hasDefault={this.checkDefault(xpos, ypos)}>
                                     {active && xpos === active[0] && ypos === active[1] ? (
-                                        <Selected active={xpos === active[0] && ypos === active[1]}>
+                                        <Selected>
                                             {newNum && j !== newNum ? newNum : j}
                                         </Selected>
                                     ) : (

@@ -58,10 +58,34 @@ class Sudoku extends Component {
             while (i < 9) {
                 //Generate 9 unique numbers per column
                 newNumber = this.shuffler();
-                if (data[j].indexOf(newNumber) === -1) {
-                    data[j].push(newNumber);
-                    i += 1;
-                } 
+                if (allData.length > 0) {
+                    //Check horizontally
+                    if (data[j].indexOf(newNumber) === -1) {
+                        //let unique = 0;
+                        let currentPos = data[j].length;
+                        // let stopLoop = 0;
+                        let colNum = [];
+                        //Check vertically
+                        for(let k = 0; k < allData.length; k++) {
+                            colNum.push(allData[k][currentPos]);
+                        }
+
+                        // //Push if not found in column
+                        if (colNum.indexOf(newNumber) === -1) {
+                            //Iterate only if pushed
+                            data[j].push(newNumber);
+                            i++;
+                        } else {
+                            continue;
+                        }
+                    }
+                } else {
+                    //First rows
+                    if (data[j].indexOf(newNumber) === -1) {
+                        data[j].push(newNumber);
+                        i += 1;
+                    }
+                }
             }
             //Push the generated 9-digits in rows
             allData.push(data[j]);
@@ -69,6 +93,24 @@ class Sudoku extends Component {
 
         return allData;
 
+    }
+
+    // setNumbers () {
+    //     let setNums = [],
+    //         newNum;
+    //     for(let i= 1; i < 10; i++ ){
+    //         setNums.push(i);
+    //     }
+
+    //     newNum = setNums()
+    // }
+
+    shuffleData(collection) {
+        collection.forEach(row => {
+            row.forEach(column => {
+                
+            });
+        });
     }
 
     /**

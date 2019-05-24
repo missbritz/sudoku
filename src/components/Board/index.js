@@ -38,6 +38,7 @@ class Board extends Component {
         })
     }
 
+
     checkDefault(posX, posY) {
         const blockValue = this.props.showNum;
         return blockValue[posX][posY] > 0;
@@ -79,6 +80,7 @@ class Board extends Component {
         return newNumber && current !== newNumber ? newNumber : current
     }
 
+    
     componentDidUpdate (prevProps) {
         //Block value has changed
         if (this.props.newNum !== prevProps.newNum) {

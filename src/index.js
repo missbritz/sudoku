@@ -2,11 +2,19 @@ import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
 import Board from './components/Board';
 import Controls from './components/Controls';
+import { shuffler, gameDifficulty } from './helpers';
+import { TEST } from './constants';
 
 class Sudoku extends Component {
     state = {
-        setNum : null
+        setNum : null,
+        allNum: []
     }
+
+    componentDidMount() {
+        this.prepareBoard();
+    }
+
     chooseNumber = (num) => {
         this.setState({
             setNum : (num > 0) ? num : 0
@@ -45,54 +53,36 @@ class Sudoku extends Component {
     /**
      * 
      * @param {*} level of game - determine how many numbers to hide
+     * [WORK IN PROGRESS]
      */
     prepareData (level) {
         let data = [],
             newNumber = 0,
             i = 0,
             allData = [];
+            //noChoke = 0;
 
         for ( let j = 0; j < 9; j++) {
             data[j] = [];
-            i = 0;
-            while (i < 9) {
-                //Generate 9 unique numbers per column
-                newNumber = this.shuffler();
-                if (allData.length > 0) {
-                    //Check horizontally
-                    if (data[j].indexOf(newNumber) === -1) {
-                        //let unique = 0;
-                        let currentPos = data[j].length;
-                        // let stopLoop = 0;
-                        let colNum = [];
-                        //Check vertically
-                        for(let k = 0; k < allData.length; k++) {
-                            colNum.push(allData[k][currentPos]);
-                        }
+            for ( let i = 0; i < 9; i++) {
+                let currentPos = data[j].length,
+                    colNum = [];
 
-                        // //Push if not found in column
-                        if (colNum.indexOf(newNumber) === -1) {
-                            //Iterate only if pushed
-                            data[j].push(newNumber);
-                            i++;
-                        } else {
-                            continue;
-                        }
-                    }
-                } else {
-                    //First rows
-                    if (data[j].indexOf(newNumber) === -1) {
-                        data[j].push(newNumber);
-                        i += 1;
+                if (allData.length) {    
+                    for(let k = 0; k < allData.length; k++) {
+                        colNum.push(allData[k][currentPos]);
                     }
                 }
+
+                newNumber = this.FindMeANum(data[j], colNum);
+                data[j].push(newNumber);
+                
             }
             //Push the generated 9-digits in rows
             allData.push(data[j]);
         }
 
         return allData;
-
     }
 
     // setNumbers () {
@@ -105,19 +95,54 @@ class Sudoku extends Component {
     //     newNum = setNums()
     // }
 
-    shuffleData(collection) {
-        collection.forEach(row => {
-            row.forEach(column => {
-                
-            });
-        });
-    }
-
     /**
      * Generate number between 1 <= 9
      */
     shuffler () {
         return parseInt(Math.random() * (10 - 1) + 1);
+    }
+    
+    /**
+     * 
+     * @param {*} arrX Collection from {} row
+     * @param {*} arrY Collection from {} column
+     */
+    FindMeANum (arrX = [], arrY = []) {
+        let i = 0,
+            newNum = 0;
+
+        while (i !== 1) {
+            newNum = this.shuffler();
+            if (arrX.indexOf(newNum) === -1 && arrY.indexOf(newNum) === -1) {
+                i++;
+            } else {
+                continue;
+            }
+        }
+
+        return newNum;
+    }
+
+    prepareBoard () {
+        const bnum = TEST.DATA1,
+                difficulty = gameDifficulty(1);
+        let index = 0;
+
+        for(let i  = 0; i < 9; i++) {
+            let hideNum = new Set();
+            //Generate difficulty level indices
+            while(hideNum.size < difficulty){
+                index = shuffler(9, true);
+                hideNum.add(index);
+            }
+            hideNum.forEach(index => {
+                bnum[i].splice(index, 1, 0);
+            });
+        }
+
+        this.setState({
+            allNum: bnum
+        });
     }
 
     /**
@@ -173,36 +198,31 @@ class Sudoku extends Component {
 
 
     render () {
+        const { allNum } = this.state;
         return (
             <div>
-                {console.log(this.prepareData(1))}
-                <Board showNum={[
-                        [0,2,5,0,6,0,0,9,0],
-                        [4,0,1,0,0,3,0,8,0],
-                        [0,9,0,0,0,0,2,0,0],
-                        [8,0,2,0,0,9,0,3,0],
-                        [0,1,0,0,4,0,0,9,6],
-                        [6,0,0,0,0,4,0,1,0],
-                        [0,2,5,0,7,0,0,0,0],
-                        [3,0,9,0,0,0,0,0,1],
-                        [4,0,0,0,0,3,0,0,2]
-                    ]}
-                    selectedNum={[
-                        [0,2,3,0,4,0,0,9,0],
-                        [4,0,1,0,0,3,0,8,0],
-                        [0,2,3,0,4,0,0,9,0],
-                        [4,0,1,0,0,3,0,8,0],
-                        [0,2,3,0,4,0,0,9,0],
-                        [4,0,1,0,0,3,0,8,0],
-                        [0,2,3,0,4,0,0,9,0],
-                        [4,0,1,0,0,3,0,8,0],
-                        [4,0,1,0,0,3,0,8,0]
-                    ]}
-                    active={this.activeBlock}
-                    newNum={this.state.setNum}
-                    level={1}
-                />
-                <Controls onSelectNum={this.chooseNumber} currentNum={this.state.setNum}/>
+                {allNum.length && (
+                    <>
+                    {console.log(allNum)}
+                    <Board showNum={allNum}
+                        selectedNum={[
+                            [0,2,3,0,4,0,0,9,0],
+                            [4,0,1,0,0,3,0,8,0],
+                            [0,2,3,0,4,0,0,9,0],
+                            [4,0,1,0,0,3,0,8,0],
+                            [0,2,3,0,4,0,0,9,0],
+                            [4,0,1,0,0,3,0,8,0],
+                            [0,2,3,0,4,0,0,9,0],
+                            [4,0,1,0,0,3,0,8,0],
+                            [4,0,1,0,0,3,0,8,0]
+                        ]}
+                        active={this.activeBlock}
+                        newNum={this.state.setNum}
+                        level={1}
+                    />
+                    <Controls onSelectNum={this.chooseNumber} currentNum={this.state.setNum}/>
+                    </>
+                )}
             </div>
         )
     }

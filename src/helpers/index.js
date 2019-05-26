@@ -1,6 +1,8 @@
     import { LEVEL, LEVELNUM } from '../constants';
     /**
-     * Generate number between 1 <= 9
+     * 
+     * @param {*} max max number of digits to generate
+     * @param {*} withZero start from zero or non-zero
      */
     const shuffler = (max, withZero = false) => {
         const startZero = withZero ? 0 : 1;

@@ -40,8 +40,12 @@ class Board extends Component {
 
 
     checkDefault(posX, posY) {
-        const blockValue = this.props.showNum;
+        const blockValue = this.props.feed;
         return blockValue[posX][posY] > 0;
+    }
+
+    validateBlock(newValue, posX, posY) {
+        this.props.checkBlock({});        
     }
 
     setActiveBlock (posX, posY, value, defaultValue) {

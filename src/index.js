@@ -124,8 +124,8 @@ class Sudoku extends Component {
     }
 
     prepareBoard () {
-        const bnum = TEST.DATA1,
-                difficulty = gameDifficulty(1);
+        const bnum = [...TEST.DATA1],
+              difficulty = gameDifficulty(1);
         let index = 0;
 
         for(let i  = 0; i < 9; i++) {
@@ -136,7 +136,8 @@ class Sudoku extends Component {
                 hideNum.add(index);
             }
             hideNum.forEach(index => {
-                bnum[i].splice(index, 1, 0);
+                //bnum[i].splice(index, 1, 0);
+                bnum[i][index] = 0;
             });
         }
 
@@ -204,7 +205,10 @@ class Sudoku extends Component {
                 {allNum.length && (
                     <>
                     {console.log(allNum)}
-                    <Board showNum={allNum}
+                    {console.log(this.props.gameData)}
+                    <Board
+                        feed={this.props.gameData}
+                        showNum={allNum}
                         selectedNum={[
                             [0,2,3,0,4,0,0,9,0],
                             [4,0,1,0,0,3,0,8,0],
@@ -219,6 +223,7 @@ class Sudoku extends Component {
                         active={this.activeBlock}
                         newNum={this.state.setNum}
                         level={1}
+                        checkBlock={this.validateNumber}
                     />
                     <Controls onSelectNum={this.chooseNumber} currentNum={this.state.setNum}/>
                     </>
@@ -230,4 +235,4 @@ class Sudoku extends Component {
 
 export default Sudoku;
 
-ReactDOM.render(<Sudoku />, document.getElementById('root'));
+ReactDOM.render(<Sudoku gameData={TEST.DATA1}/>, document.getElementById('root'));
